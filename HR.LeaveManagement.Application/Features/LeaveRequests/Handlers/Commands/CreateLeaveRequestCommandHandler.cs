@@ -2,6 +2,7 @@
 using HR.LeaveManagement.Application.DTOs.LeaveRequest.Validators;
 using HR.LeaveManagement.Application.Features.LeaveRequests.Requests.Commands;
 using HR.LeaveManagement.Application.Persistence.Contracts;
+using HR.LeaveManagement.Application.Responses;
 using HR.LeaveManagement.Domain;
 using MediatR;
 using System;
@@ -33,6 +34,9 @@ namespace HR.LeaveManagement.Application.Features.LeaveRequests.Handlers.Command
 
             if (validationResult.IsValid == false)
                 {
+                    response.Success = false;
+                    response.Message = "Creation failed";
+                    response.Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
                 }
 
             var leaveRequest = _mapper.Map<LeaveRequest>(request.LeaveRequestDTO);
