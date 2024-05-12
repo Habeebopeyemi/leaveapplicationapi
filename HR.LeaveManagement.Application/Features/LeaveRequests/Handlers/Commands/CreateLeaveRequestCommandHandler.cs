@@ -26,12 +26,14 @@ namespace HR.LeaveManagement.Application.Features.LeaveRequests.Handlers.Command
 
         public async Task<int> Handle(CreateLeaveRequestCommand request, CancellationToken cancellationToken)
         {
+            var response = new BaseCommandResponse();
             //using fluent validator
             var validator = new CreateLeaveRequestDtoValidator(_leaveTypeRepository);
             var validationResult = await validator.ValidateAsync(request.LeaveRequestDTO);
 
             if (validationResult.IsValid == false)
-                throw new Exception();
+                {
+                }
 
             var leaveRequest = _mapper.Map<LeaveRequest>(request.LeaveRequestDTO);
 
