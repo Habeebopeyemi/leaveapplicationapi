@@ -1,12 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HR.LeaveManagement.Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace HR.LeaveManagement.Persistence
 {
-    internal class HRLeaveManagementDbContext
+    public class HRLeaveManagementDbContext : DbContext
     {
+        public HRLeaveManagementDbContext(DbContextOptions<HRLeaveManagementDbContext> options )
+            : base( options )
+        {
+            
+        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfigurationsFromAssembly( typeof( HRLeaveManagementDbContext ).Assembly );
+        }
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            return base.SaveChangesAsync(cancellationToken);
+        }
+        public DbSet<LeaveType> LeaveTypes { get; set; }
+        public DbSet<LeaveRequest> LeaveRequests { get; set; }
+        public DbSet<leaveAllocation> LeaveAllocations { get; set; }
     }
 }

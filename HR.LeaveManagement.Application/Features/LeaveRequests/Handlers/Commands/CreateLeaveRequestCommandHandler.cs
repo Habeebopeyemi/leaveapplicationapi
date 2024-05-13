@@ -5,15 +5,11 @@ using HR.LeaveManagement.Application.Persistence.Contracts;
 using HR.LeaveManagement.Application.Responses;
 using HR.LeaveManagement.Domain;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace HR.LeaveManagement.Application.Features.LeaveRequests.Handlers.Commands
 {
-    public class CreateLeaveRequestCommandHandler : IRequestHandler<CreateLeaveRequestCommand, int>
+    public class CreateLeaveRequestCommandHandler : IRequestHandler<CreateLeaveRequestCommand, BaseCommandResponse>
     {
         private readonly IMapper _mapper;
         private readonly ILeaveRequestRepository _leaveRequestRepository;
@@ -25,7 +21,7 @@ namespace HR.LeaveManagement.Application.Features.LeaveRequests.Handlers.Command
             _leaveTypeRepository = leaveTypeRepository;
         }
 
-        public async Task<int> Handle(CreateLeaveRequestCommand request, CancellationToken cancellationToken)
+        public async Task<BaseCommandResponse> Handle(CreateLeaveRequestCommand request, CancellationToken cancellationToken)
         {
             var response = new BaseCommandResponse();
             //using fluent validator
@@ -33,17 +29,21 @@ namespace HR.LeaveManagement.Application.Features.LeaveRequests.Handlers.Command
             var validationResult = await validator.ValidateAsync(request.LeaveRequestDTO);
 
             if (validationResult.IsValid == false)
-                {
-                    response.Success = false;
-                    response.Message = "Creation failed";
-                    response.Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
-                }
+            {
+                response.Success = false;
+                response.Message = "Creation failed";
+                response.Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+            }
 
             var leaveRequest = _mapper.Map<LeaveRequest>(request.LeaveRequestDTO);
 
             leaveRequest = await _leaveRequestRepository.Add(leaveRequest);
 
-            return leaveRequest.Id;
+            response.Success = true;
+            response.Message = "Creation successful";
+            response.Id = leaveRequest.Id;
+
+            return response;
         }
     }
 }
