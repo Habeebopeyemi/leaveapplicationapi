@@ -1,5 +1,6 @@
 ﻿using HR.LeaveManagement.Application.Persistence.Contracts;
 using HR.LeaveManagement.Domain;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,19 +17,23 @@ namespace HR.LeaveManagement.Persistence.Repositories
             _dbContext = dbContext;
         }
 
-        public Task ChangeApprovalStatus(LeaveRequest leaveRequest, bool? ApprovalStatus)
+        public async Task ChangeApprovalStatus(LeaveRequest leaveRequest, bool? ApprovalStatus)
         {
-            throw new NotImplementedException();
+            leaveRequest.Approved = ApprovalStatus;
+            _dbContext.Entry(leaveRequest).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
         }
 
-        public Task<List<LeaveRequest>> GetLeaveRequestsWithDetails()
+        public async Task<List<LeaveRequest>> GetLeaveRequestsWithDetails()
         {
-            throw new NotImplementedException();
+            var leaveRequests = await _dbContext.LeaveRequests.Include(q => q.LeaveType).ToListAsync();
+            return leaveRequests;
         }
 
-        public Task<LeaveRequest> GetLeaveRequestWithDetails(int id)
+        public async Task<LeaveRequest> GetLeaveRequestWithDetails(int id)
         {
-            throw new NotImplementedException();
+            var leaveRequest = await _dbContext.LeaveRequests.Include(q => q.LeaveType).FirstOrDefaultAsync(q => q.Id == id);
+            return leaveRequest;
         }
     }
 }
